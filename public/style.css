@@ -1,0 +1,517 @@
+
+/* ---------- Global styles ---------- */
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --page-bg: #f4f1e8;
+    --panel-bg: #fffdf7;
+    --text-color: #30342b;
+    --muted-color: #777966;
+    --border-color: #dedbcd;
+    --accent-color: #78845a;
+    --accent-hover: #626e46;
+    --soft-accent: #edf0e4;
+}
+
+body {
+    margin: 0;
+    padding: 48px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--page-bg);
+    color: var(--text-color);
+}
+
+.app-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 36px;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(48, 52, 43, 0.06);
+}
+
+h1 {
+    margin: 0 0 28px;
+    font-size: 32px;
+    line-height: 1.25;
+    color: var(--text-color);
+    letter-spacing: -0.8px;
+}
+
+h2 {
+    margin: 34px 0 18px;
+    font-size: 21px;
+    color: var(--text-color);
+}
+
+
+/* ---------- Upload section ---------- */
+.upload-section {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    max-width: 650px;
+}
+
+#fileInput {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    padding: 10px 12px;
+    background-color: #fffdf7;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+#uploadButton {
+    padding: 12px 20px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#uploadButton:hover {
+    background-color: var(--accent-hover);
+}
+
+#uploadButton:disabled {
+    background-color: #b9bdad;
+    cursor: not-allowed;
+}
+
+
+/* ---------- File picker polish ---------- */
+#fileInput::file-selector-button {
+    margin-right: 12px;
+    padding: 9px 14px;
+    background-color: var(--soft-accent);
+    color: var(--text-color);
+    border: 1px solid #c8cbb8;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#fileInput::file-selector-button:hover {
+    background-color: #dfe4d2;
+}
+
+
+/* ---------- Upload progress ---------- */
+#progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 650px;
+    margin: 28px 0;
+    padding: 16px 20px;
+    background-color: var(--soft-accent);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+#uploadProgress {
+    flex: 1;
+    width: 100%;
+    height: 16px;
+    overflow: hidden;
+    border: none;
+    border-radius: 999px;
+    background-color: #dedfD3;
+    accent-color: var(--accent-color);
+}
+
+#uploadProgress::-webkit-progress-bar {
+    background-color: #dedfd3;
+    border-radius: 999px;
+}
+
+#uploadProgress::-webkit-progress-value {
+    background-color: var(--accent-color);
+    border-radius: 999px;
+    transition: width 0.25s ease;
+}
+
+#uploadProgress::-moz-progress-bar {
+    background-color: var(--accent-color);
+    border-radius: 999px;
+}
+
+#progressText {
+    min-width: 48px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-align: right;
+}
+
+
+/* ---------- Uploaded file list ---------- */
+#fileList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#fileList li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 18px 20px;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#fileList li:hover {
+    border-color: #b8c0a3;
+    box-shadow: 0 4px 12px rgba(48, 52, 43, 0.06);
+}
+
+/* Filename links */
+#fileList a {
+    flex: 1;
+    min-width: 0;
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+#fileList a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Delete buttons */
+#fileList button {
+    padding: 9px 14px;
+    background-color: #f8e9e6;
+    color: #a4473d;
+    border: 1px solid #f0d5d0;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#fileList button:hover {
+    background-color: #f2d9d4;
+    border-color: #e8c1ba;
+}
+
+
+/* ---------- Retro document viewer ---------- */
+#documentViewer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background-color: rgba(43, 38, 29, 0.94);
+}
+
+#closeDocumentViewer {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    padding: 10px 16px;
+    background-color: #e8dfc8;
+    color: #494331;
+    border: 1px solid #c8b995;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+#closeDocumentViewer:hover {
+    background-color: #d8c9a7;
+}
+
+#documentContent {
+    width: 96%;
+    max-width: 1500px;
+    height: 94%;
+    margin: auto;
+    padding: 16px;
+    overflow: auto;
+    background-color: #f8f4e9;
+    color: #302d25;
+    border: 1px solid #c8b995;
+    border-radius: 10px;
+}
+
+#documentContent iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    border: none;
+    background-color: white;
+}
+
+
+/* ---------- Smooth document viewer animation ---------- */
+#documentViewer {
+    animation: viewerFadeIn 0.25s ease-out;
+}
+
+#documentContent {
+    animation: documentPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+}
+
+@keyframes viewerFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes documentPopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #documentViewer,
+    #documentContent {
+        animation: none;
+    }
+}
+
+
+/* ---------- Smooth closing animation ---------- */
+#documentViewer.closing {
+    animation: viewerFadeOut 0.22s ease-in forwards;
+}
+
+#documentViewer.closing #documentContent {
+    animation: documentPopOut 0.22s ease-in forwards;
+}
+
+@keyframes viewerFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes documentPopOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.94) translateY(12px);
+    }
+}
+
+
+/* ---------- Retro image viewer ---------- */
+#imageViewer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 24px 24px;
+    background-color: rgba(43, 38, 29, 0.94);
+}
+
+#imageViewer img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    margin: auto;
+}
+
+#closeViewer {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    padding: 10px 16px;
+    background-color: #e8dfc8;
+    color: #494331;
+    border: 1px solid #c8b995;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#closeViewer:hover {
+    background-color: #d8c9a7;
+}
+
+
+/* ---------- Image viewer animations ---------- */
+#imageViewer {
+    animation: viewerFadeIn 0.25s ease-out;
+}
+
+#imageViewer img {
+    animation: documentPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#imageViewer.closing {
+    animation: viewerFadeOut 0.22s ease-in forwards;
+}
+
+#imageViewer.closing img {
+    animation: documentPopOut 0.22s ease-in forwards;
+}
+
+
+/* ---------- Consistent button interactions ---------- */
+#uploadButton,
+#fileInput::file-selector-button,
+#fileList button,
+#closeViewer,
+#closeDocumentViewer {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Lift slightly on hover */
+#uploadButton:hover,
+#fileInput::file-selector-button:hover,
+#fileList button:hover,
+#closeViewer:hover,
+#closeDocumentViewer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(48, 52, 43, 0.12);
+}
+
+/* Press down when clicked */
+#uploadButton:active,
+#fileInput::file-selector-button:active,
+#fileList button:active,
+#closeViewer:active,
+#closeDocumentViewer:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+}
+
+/* Visible keyboard focus */
+#uploadButton:focus-visible,
+#fileInput::file-selector-button:focus-visible,
+#fileList button:focus-visible,
+#closeViewer:focus-visible,
+#closeDocumentViewer:focus-visible {
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 3px;
+}
+
+
+/* ---------- Retro page entrance ---------- */
+.app-container {
+    animation: appEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: center top;
+}
+
+.app-container h1 {
+    animation: contentEntrance 0.5s ease-out 0.12s both;
+}
+
+.app-container .upload-section {
+    animation: contentEntrance 0.5s ease-out 0.22s both;
+}
+
+.app-container #progressContainer {
+    animation: contentEntrance 0.5s ease-out 0.3s both;
+}
+
+.app-container h2,
+.app-container #fileList {
+    animation: contentEntrance 0.5s ease-out 0.38s both;
+}
+
+@keyframes appEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes contentEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-container,
+    .app-container h1,
+    .app-container .upload-section,
+    .app-container #progressContainer,
+    .app-container h2,
+    .app-container #fileList {
+        animation: none;
+    }
+}
+
+
+
+
+
+
+
+
+
+

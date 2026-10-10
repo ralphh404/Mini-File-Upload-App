@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini File Upload App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <main class="app-container">
+        <h1>Mini File Upload App</h1>
+
+        <div class="upload-section">
+            <input type="file" id="fileInput" multiple>
+            <button id="uploadButton">Upload File</button>
+        </div>
+
+        <div id="progressContainer">
+            <progress id="uploadProgress" value="0" max="100"></progress>
+            <span id="progressText">0%</span>
+        </div>
+
+        <h2>Uploaded Files</h2>
+        <ul id="fileList"></ul>
+    </main>
+
+    <div id="imageViewer" class="image-viewer">
+        <button id="closeViewer" type="button">✕ Close</button>
+        <img id="previewImage" src="" alt="Image preview">
+    </div>
+
+    <div id="documentViewer" class="image-viewer">
+        <button id="closeDocumentViewer" type="button">
+            ✕ Close
+        </button>
+        <div id="documentContent"></div>
+    </div>
+
+    <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
