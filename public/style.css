@@ -550,8 +550,33 @@ h2 {
     }
 
     #fileList li {
-        gap: 10px;
-        padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px;
+    }
+
+    #fileList li a {
+        width: 100%;
+        flex: none;
+        overflow-wrap: anywhere;
+    }
+
+    #fileList li span {
+        width: 100%;
+    }
+
+    #fileList li .file-actions {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    #fileList li .file-actions button {
+        flex: 1;
+        min-width: 0;
+        min-height: 44px;
     }
 
     #fileList button {
