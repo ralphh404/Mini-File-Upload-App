@@ -83,12 +83,14 @@ async function loadFiles() {
 
     
         files.forEach(function(file) {
-            const filename = file.name;
+            const filename = file.filename;
+            const displayName = file.name;
 
             const listItem = document.createElement("li");
 
             const fileLink = document.createElement("a");
-            fileLink.textContent = filename;
+            
+            fileLink.textContent = displayName;
             fileLink.href = "/files/" + encodeURIComponent(filename);
 
             fileLink.addEventListener("click", function(event) {
@@ -131,6 +133,46 @@ async function loadFiles() {
 
             listItem.appendChild(fileLink);
 
+            const buttonGroup = document.createElement("div");
+            buttonGroup.classList.add("file-actions");
+            const renameButton = document.createElement("button");
+            renameButton.textContent = "Rename";
+            renameButton.classList.add("renameButton");
+
+            renameButton.addEventListener("click", async function() {
+                const newName = prompt("Enter a new display name:", displayName);
+
+                if (newName === null) {
+                    return;
+                }
+
+                const trimmedName = newName.trim();
+
+                if (!trimmedName) {
+                    alert("Filename cannot be empty.");
+                    return;
+                }
+
+                const response = await fetch("/files/" + encodeURIComponent(filename), {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        displayName: trimmedName
+                    })
+                });
+
+                const result = await response.json();
+                alert(result.message);
+
+                if (response.ok) {
+                    loadFiles();
+                }
+            });
+
+            buttonGroup.appendChild(renameButton);
+
             const fileInfo = document.createElement("span");
             fileInfo.textContent =
                 " — " + (file.size / 1024).toFixed(1) + " KB (" + file.type + ")";
@@ -139,6 +181,7 @@ async function loadFiles() {
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.classList.add("deleteButton");
 
             deleteButton.addEventListener("click", async function() {
                 const confirmed = confirm("Are you sure you want to delete " + filename + "?");
@@ -157,7 +200,8 @@ async function loadFiles() {
                 loadFiles();
             });
 
-            listItem.appendChild(deleteButton);
+            buttonGroup.appendChild(deleteButton);
+            listItem.appendChild(buttonGroup);
             fileList.appendChild(listItem);
         });
 

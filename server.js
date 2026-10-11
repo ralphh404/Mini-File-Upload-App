@@ -79,6 +79,7 @@ const upload = multer({
 
 
 const app = express();
+app.use(express.json());
 
 app.use(express.static("public"));
 
@@ -117,6 +118,7 @@ app.post("/upload", function(req, res) {
 
                     return {
                         filename: file.filename,
+                        displayName: file.originalname,
                         publicUrl: result.secure_url,
                         publicId: result.public_id
                     };
@@ -126,7 +128,8 @@ app.post("/upload", function(req, res) {
             uploadedFiles.forEach(function(file) {
                 fileMetadata[file.filename] = {
                     publicUrl: file.publicUrl,
-                    publicId: file.publicId
+                    publicId: file.publicId,
+                    displayName: file.displayName
                 };
             });
 
@@ -168,7 +171,8 @@ app.get("/files", function(req, res) {
                 const stats = fs.statSync(filePath);
 
                 return {
-                    name: entry.name,
+                    filename: entry.name,
+                    name: fileMetadata[entry.name]?.displayName || entry.name,
                     size: stats.size,
                     type: path.extname(entry.name).slice(1).toUpperCase() || "Unknown",
                     publicUrl: fileMetadata[entry.name]?.publicUrl ||
@@ -199,6 +203,49 @@ app.get("/files/:filename", function(req, res) {
     });
 });
 
+
+app.patch("/files/:filename", async function(req, res) {
+    const filename = path.basename(req.params.filename);
+    const newName = req.body.displayName?.trim();
+
+    const originalExtension = path.extname(filename);
+    const newExtension = path.extname(newName);
+
+    if (newExtension.toLowerCase() !== originalExtension.toLowerCase()) {
+    return res.status(400).json({
+        message: "You must keep the original file extension."
+    });
+}
+
+    if (!newName) {
+        return res.status(400).json({
+            message: "Please enter a filename."
+        });
+    }
+
+    fileMetadata[filename] = {
+        ...fileMetadata[filename],
+        displayName: newName
+    };
+
+    try {
+        await fs.promises.writeFile(
+            metadataPath,
+            JSON.stringify(fileMetadata, null, 2)
+        );
+
+        res.json({
+            message: "File renamed successfully!",
+            displayName: newName
+        });
+    } catch (error) {
+        console.error("File rename failed:", error.message);
+
+        res.status(500).json({
+            message: "Unable to rename file."
+        });
+    }
+});
 
 
 app.delete("/files/:filename", async function(req, res) {

@@ -583,6 +583,40 @@ h2 {
     }
 }
 
+#fileList li .file-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+#fileList li .file-actions button {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+#fileList li .renameButton {
+    background-color: #e8eddc;
+    color: #53633b;
+    border: 1px solid #cbd5b5;
+}
+
+#fileList li .renameButton:hover {
+    background-color: #dce5cb;
+    border-color: #bdcba4;
+}
+
+#fileList li .deleteButton {
+    background-color: #f9e8e5;
+    color: #b5483e;
+    border: 1px solid #f2d0ca;
+}
+
+#fileList li .deleteButton:hover {
+    background-color: #f2d9d4;
+    border-color: #e8c1ba;
+}
+
 
 
 
