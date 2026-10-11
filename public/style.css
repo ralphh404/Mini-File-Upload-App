@@ -643,6 +643,220 @@ h2 {
 }
 
 
+/* Soft Olive: search and sorting controls */
+.file-controls {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+#searchInput {
+    box-sizing: border-box;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text-color);
+    background-color: #fffaf0;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    outline: none;
+    opacity: 1;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#searchInput::placeholder {
+    color: #898978;
+    opacity: 1;
+}
+
+#searchInput:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(120, 132, 90, 0.15);
+}
+
+.sort-dropdown {
+    position: relative;
+    flex: 0 0 214px;
+    min-width: 0;
+    z-index: 20;
+}
+
+.sort-select-hidden {
+    display: none;
+}
+
+.sort-button {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text-color);
+    background-color: #fffaf0;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s,
+        background-color 0.2s;
+}
+
+.sort-button:hover,
+.sort-dropdown.open .sort-button {
+    background-color: var(--soft-accent);
+    border-color: var(--accent-color);
+}
+
+.sort-button:focus-visible,
+.sort-option:focus-visible {
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 3px;
+}
+
+.sort-chevron {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    border-right: 2px solid var(--accent-hover);
+    border-bottom: 2px solid var(--accent-hover);
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.22s ease;
+}
+
+.sort-dropdown.open .sort-chevron {
+    transform: translateY(2px) rotate(225deg);
+}
+
+.sort-menu {
+    position: absolute;
+     z-index: 21;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    padding: 6px;
+    background-color: #fffdf7;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(48, 52, 43, 0.14);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-7px) scale(0.98);
+    transform-origin: top center;
+    transition: opacity 0.18s ease, transform 0.18s ease,
+        visibility 0.18s;
+}
+
+.sort-dropdown.open .sort-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.sort-option {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    text-align: left;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text-color);
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.sort-option:hover,
+.sort-option.selected {
+    background-color: var(--soft-accent);
+    color: var(--accent-hover);
+}
+
+@media (max-width: 600px) {
+    .file-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    #searchInput {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .sort-dropdown {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .sort-button {
+        width: 100%;
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sort-menu,
+    .sort-chevron,
+    .sort-button,
+    .sort-option,
+    #searchInput {
+        transition: none;
+    }
+}
+
+
+/* Search and sort controls entrance animation */
+.file-controls {
+    position: relative;
+    z-index: 1;
+    animation: controlsEntrance 0.55s ease-out 0.42s both;
+    transform-origin: center top;
+}
+
+/* Bring controls above file cards when sorting */
+.file-controls:has(.sort-dropdown.open) {
+    z-index: 100;
+}
+
+@keyframes controlsEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .file-controls {
+        animation: none;
+    }
+}
+
+
+
+
+
+
+
 
 
 

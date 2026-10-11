@@ -22,8 +22,51 @@
             <span id="progressText">0%</span>
         </div>
 
-        <h2>Uploaded Files</h2>
-        <ul id="fileList"></ul>
+    <h2>Uploaded Files</h2>
+
+    <div class="file-controls">
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search files..."
+        >
+
+        
+    <div class="sort-dropdown" id="sortDropdown">
+        <select id="sortSelect" class="sort-select-hidden" aria-hidden="true" tabindex="-1">
+            <option value="name">Sort by Name</option>
+            <option value="date">Sort by Date</option>
+            <option value="size">Sort by Size</option>
+        </select>
+
+        <button
+            type="button"
+            id="sortButton"
+            class="sort-button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sortMenu"
+        >
+            <span id="sortLabel">Sort by Name</span>
+            <span class="sort-chevron" aria-hidden="true"></span>
+        </button>
+
+        <div id="sortMenu" class="sort-menu" role="listbox" aria-label="Sort files">
+            <button type="button" class="sort-option selected" role="option" data-value="name" aria-selected="true">
+                Sort by Name
+            </button>
+            <button type="button" class="sort-option" role="option" data-value="date" aria-selected="false">
+                Sort by Date
+            </button>
+            <button type="button" class="sort-option" role="option" data-value="size" aria-selected="false">
+                Sort by Size
+            </button>
+        </div>
+    </div>
+
+    </div>
+
+    <ul id="fileList"></ul>
     </main>
 
     <div id="imageViewer" class="image-viewer">

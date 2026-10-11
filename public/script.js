@@ -1,6 +1,57 @@
 const fileInput = document.getElementById("fileInput");
 const uploadButton = document.getElementById("uploadButton");
 
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+
+
+const sortDropdown = document.getElementById("sortDropdown");
+const sortButton = document.getElementById("sortButton");
+const sortLabel = document.getElementById("sortLabel");
+const sortMenu = document.getElementById("sortMenu");
+const sortOptions = document.querySelectorAll(".sort-option");
+
+    function closeSortMenu() {
+        sortDropdown.classList.remove("open");
+        sortButton.setAttribute("aria-expanded", "false");
+    }
+
+    sortButton.addEventListener("click", function() {
+        const isOpen = sortDropdown.classList.toggle("open");
+        sortButton.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    sortOptions.forEach(function(option) {
+        option.addEventListener("click", function() {
+            const selectedValue = option.dataset.value;
+
+            sortSelect.value = selectedValue;
+            sortLabel.textContent = option.textContent.trim();
+
+            sortOptions.forEach(function(item) {
+                const isSelected = item === option;
+                item.classList.toggle("selected", isSelected);
+                item.setAttribute("aria-selected", String(isSelected));
+            });
+
+            closeSortMenu();
+            loadFiles();
+        });
+    });
+
+    document.addEventListener("click", function(event) {
+        if (!sortDropdown.contains(event.target)) {
+            closeSortMenu();
+        }
+    });
+
+    sortButton.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeSortMenu();
+        }
+    });
+
+
 
 uploadButton.addEventListener("click", function() {
     const files = fileInput.files;
@@ -80,9 +131,32 @@ async function loadFiles() {
 
     const fileList = document.getElementById("fileList");
     fileList.innerHTML = "";
+    let displayedFiles = files;
 
     
-        files.forEach(function(file) {
+    displayedFiles = files.filter(function(file) {
+            return file.name.toLowerCase().includes(
+                searchInput.value.toLowerCase().trim()
+            );
+        });
+
+        const sortOption = sortSelect.value;
+
+    displayedFiles.sort(function(a, b) {
+        if (sortOption === "name") {
+            return a.name.localeCompare(b.name);
+        }
+
+        if (sortOption === "size") {
+            return a.size - b.size;
+        }
+
+        if (sortOption === "date") {
+            return new Date(b.modifiedAt) - new Date(a.modifiedAt);
+        }
+    });
+
+    displayedFiles.forEach(function(file) {
             const filename = file.filename;
             const displayName = file.name;
 
@@ -208,6 +282,11 @@ async function loadFiles() {
 }
 
 loadFiles();
+
+    searchInput.addEventListener("input", function() {
+        loadFiles();
+    });
+
 
 const imageViewer = document.getElementById("imageViewer");
 const previewImage = document.getElementById("previewImage");

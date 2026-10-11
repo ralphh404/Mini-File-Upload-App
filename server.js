@@ -174,6 +174,7 @@ app.get("/files", function(req, res) {
                     filename: entry.name,
                     name: fileMetadata[entry.name]?.displayName || entry.name,
                     size: stats.size,
+                    modifiedAt: stats.mtime,
                     type: path.extname(entry.name).slice(1).toUpperCase() || "Unknown",
                     publicUrl: fileMetadata[entry.name]?.publicUrl ||
                     (typeof fileMetadata[entry.name] === "string"
