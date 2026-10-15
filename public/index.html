@@ -22,6 +22,71 @@
             <span id="progressText">0%</span>
         </div>
 
+    <div class="folder-section">
+        <div class="folder-header">
+            <h2>My Folders</h2>
+            <button id="createFolderButton" type="button">
+                <span class="plus-icon" aria-hidden="true">+</span>
+                <span>Create Folder</span>
+            </button>
+
+            <button id="openFolderButton" type="button">
+                Open Folder
+            </button>
+
+            <button id="deleteFolderButton" type="button">
+                Delete Folder
+            </button>
+        </div>
+
+        <div id="folderList" class="folder-list"></div>
+
+        <div id="folderContents" hidden>
+            <button id="backToFoldersButton" type="button">
+                ← Back to Folders
+            </button>
+            
+            <h3 id="currentFolderName"></h3>
+
+            <div id="folderBulkMoveControls">
+                <label>
+                    <input type="checkbox" id="selectAllFolderFiles">
+                    Select All
+                </label>
+
+                
+            <div class="custom-folder-dropdown" id="folderDestinationDropdown">
+                <button
+                    type="button"
+                    class="folder-dropdown-trigger"
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                >
+                    <span>Choose a folder</span>
+                    <span class="dropdown-chevron" aria-hidden="true">⌃</span>
+                </button>
+
+                <div class="folder-dropdown-menu" role="listbox" hidden></div>
+            </div>
+
+            <select id="folderDestination" hidden>
+                <option value="">Choose a folder</option>
+            </select>
+
+
+                <button type="button" id="moveFolderFilesButton">
+                    Move Selected
+                </button>
+
+                <button type="button" id="moveToUploadedFilesButton">
+                    Move to Uploaded Files
+                </button>
+            </div>
+
+            <ul id="folderFileList"></ul>
+        </div>
+    </div>
+
     <h2>Uploaded Files</h2>
 
     <div class="file-controls">
@@ -66,6 +131,24 @@
 
     </div>
 
+    <div id="bulkMoveControls">
+        <label>
+            <input type="checkbox" id="selectAllFiles">
+            Select All
+        </label>
+
+        <div class="custom-folder-dropdown" id="destinationFolderDropdown">
+            <button type="button" class="folder-dropdown-trigger" aria-expanded="false">
+                <span>Choose a folder</span>
+                <span class="dropdown-chevron" aria-hidden="true">⌃</span>
+            </button>
+            <div class="folder-dropdown-menu" hidden></div>
+        </div>
+
+        <button type="button" id="moveSelectedButton">
+            Move Selected
+        </button>
+    </div>
     <ul id="fileList"></ul>
     </main>
 

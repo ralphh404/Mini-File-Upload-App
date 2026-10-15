@@ -7,6 +7,11 @@ const fs = require("fs");
 const metadataPath = path.join(__dirname, "files.json");
 let fileMetadata = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
 
+const foldersPath = path.join(__dirname, "folders.json");
+let folders = JSON.parse(fs.readFileSync(foldersPath, "utf8"));
+const fileLocationsPath = path.join(__dirname, "fileLocations.json");
+let fileLocations = JSON.parse(fs.readFileSync(fileLocationsPath, "utf8"));
+
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
@@ -164,8 +169,8 @@ app.get("/files", function(req, res) {
 
         const files = entries
             .filter(function(entry) {
-                return entry.isFile();
-            })
+            return entry.isFile() && !fileLocations[entry.name];
+                })
             .map(function(entry) {
                 const filePath = path.join(__dirname, "uploads", entry.name);
                 const stats = fs.statSync(filePath);
@@ -187,6 +192,220 @@ app.get("/files", function(req, res) {
     });
 });
 
+
+app.get("/folders", function(req, res) {
+    res.json(folders);
+});
+
+app.get("/folders/:folderId/files", function(req, res) {
+    const folderId = req.params.folderId;
+
+    if (!folders[folderId]) {
+        return res.status(404).json({
+            message: "Folder not found."
+        });
+    }
+
+    const folderFiles = Object.entries(fileLocations)
+        .filter(function([filename, assignedFolderId]) {
+            return assignedFolderId === folderId;
+        })
+        .map(function([filename]) {
+            const filePath = path.join(__dirname, "uploads", filename);
+
+            if (!fs.existsSync(filePath)) {
+                return null;
+            }
+
+            const stats = fs.statSync(filePath);
+            const metadata = fileMetadata[filename];
+
+            return {
+                filename: filename,
+                name: metadata?.displayName || filename,
+                size: stats.size,
+                modifiedAt: stats.mtime,
+                type: path.extname(filename).slice(1).toUpperCase() || "Unknown",
+                publicUrl: metadata?.publicUrl ||
+                    (typeof metadata === "string" ? metadata : null)
+            };
+        })
+        .filter(function(file) {
+            return file !== null;
+        });
+
+    res.json(folderFiles);
+});
+
+
+app.post("/folders", function(req, res) {
+    const folderName = req.body.name?.trim();
+
+    if (!folderName) {
+        return res.status(400).json({
+            message: "Folder name is required."
+        });
+    }
+
+    const folderId = Date.now().toString();
+
+    folders[folderId] = {
+        name: folderName
+    };
+
+    fs.writeFileSync(
+        foldersPath,
+        JSON.stringify(folders, null, 2)
+    );
+
+    res.status(201).json({
+        id: folderId,
+        name: folderName
+    });
+});
+
+
+app.delete("/folders/:folderId", async function(req, res) {
+    const folderId = req.params.folderId;
+
+    if (!folders[folderId]) {
+        return res.status(404).json({
+            message: "Folder not found."
+        });
+    }
+
+    const filenames = Object.entries(fileLocations)
+        .filter(function([filename, assignedFolderId]) {
+            return assignedFolderId === folderId;
+        })
+        .map(function([filename]) {
+            return filename;
+        });
+
+    try {
+        for (const filename of filenames) {
+            const filePath = path.join(__dirname, "uploads", filename);
+
+            const localFileExists = fs.existsSync(filePath);
+
+            const metadata = fileMetadata[filename];
+            let publicId = null;
+
+            if (metadata && typeof metadata === "object") {
+                publicId = metadata.publicId || null;
+            } else if (typeof metadata === "string") {
+                try {
+                    const url = new URL(metadata);
+
+                    if (
+                        url.hostname === "res.cloudinary.com" &&
+                        url.pathname.startsWith("/fg9q738m/raw/upload/")
+                    ) {
+                        const parts = url.pathname.split("/");
+                        const uploadIndex = parts.indexOf("upload");
+
+                        if (uploadIndex !== -1) {
+                            const assetParts = parts.slice(uploadIndex + 1);
+
+                            if (/^v\d+$/.test(assetParts[0])) {
+                                assetParts.shift();
+                            }
+
+                            publicId = assetParts.join("/");
+                        }
+                    }
+                } catch {
+                    // Leave publicId null if the legacy URL is invalid.
+                }
+            }
+
+            if (publicId) {
+                const cloudResult = await cloudinary.uploader.destroy(
+                    publicId,
+                    { resource_type: "raw" }
+                );
+
+                if (
+                    cloudResult.result !== "ok" &&
+                    cloudResult.result !== "not found"
+                ) {
+                    throw new Error(
+                        "Cloudinary deletion failed for " + filename
+                    );
+                }
+            }
+
+            if (localFileExists) {
+                await fs.promises.unlink(filePath);
+            }
+
+            delete fileMetadata[filename];
+            delete fileLocations[filename];
+        }
+
+        delete folders[folderId];
+
+        await fs.promises.writeFile(
+            metadataPath,
+            JSON.stringify(fileMetadata, null, 2)
+        );
+
+        await fs.promises.writeFile(
+            fileLocationsPath,
+            JSON.stringify(fileLocations, null, 2)
+        );
+
+        await fs.promises.writeFile(
+            foldersPath,
+            JSON.stringify(folders, null, 2)
+        );
+
+        res.json({
+            message: "Folder and its files deleted successfully."
+        });
+    } catch (error) {
+        console.error("Folder deletion failed:", error.message);
+
+        res.status(500).json({
+            message: "Folder deletion failed. Check the server logs."
+        });
+    }
+});
+
+
+app.post("/files/move", function(req, res) {
+    const filenames = req.body.filenames;
+    const folderId = req.body.folderId;
+
+    if (!Array.isArray(filenames) || filenames.length === 0) {
+        return res.status(400).json({
+            message: "Please select at least one file."
+        });
+    }
+
+    if (folderId !== null && (!folderId || !folders[folderId])) {
+        return res.status(400).json({
+            message: "Please choose a valid destination folder."
+        });
+    }
+
+    filenames.forEach(function(filename) {
+        if (folderId === null) {
+            delete fileLocations[filename];
+        } else {
+            fileLocations[filename] = folderId;
+        }
+    });
+
+    fs.writeFileSync(
+        fileLocationsPath,
+        JSON.stringify(fileLocations, null, 2)
+    );
+
+    res.json({
+        message: filenames.length + " file(s) moved successfully."
+    });
+});
 
 
 app.get("/files/:filename", function(req, res) {
