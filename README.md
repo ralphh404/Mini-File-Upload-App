@@ -54,9 +54,20 @@ One of the biggest challenges was starting from scratch and understanding how th
 
 ## Project Status
 
-The core features of the mini file upload app are complete. I am no longer adding features to this version, as I want to focus on a new learning phase: **implementing authentication**.
+The core features of this app are complete:
 
-This next phase will give me an opportunity to build on the existing application and learn more about user authentication and access control.
+- File uploads with type and size restrictions (images, PDFs, text, and Office files, up to 10 MB each)
+- Folders for organizing files
+- Search and sorting by name, size, or date
+- Rename and delete
+- Image and document previews
+- Global limits of 15 files and 5 folders
+
+I'm not adding more features to this version.
+
+This app is intentionally open so anyone can try it as a public demo. That's why there's no login, and why the file and folder limits are shared by all visitors.
+
+
 
 ## Author
 
