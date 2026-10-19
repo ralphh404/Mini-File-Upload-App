@@ -4,6 +4,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+const MAX_FILES = 15;
+const MAX_FOLDERS = 5;
+let pendingUploads = 0;
+
 const metadataPath = path.join(__dirname, "files.json");
 let fileMetadata = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
 
@@ -45,7 +49,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 25 * 1024 * 1024
+        fileSize: 10 * 1024 * 1024
     },
 
     fileFilter: function(req, file, cb) {
@@ -91,11 +95,19 @@ app.use(express.static("public"));
 
 
 app.post("/upload", function(req, res) {
+    const currentCount = Object.keys(fileMetadata).length + pendingUploads;
+
+    if (currentCount >= MAX_FILES) {
+        return res.status(409).json({
+            message: "The file manager is full (" + MAX_FILES + " files max)."
+        });
+    }
+
     upload.array("files", 10)(req, res, async function(err) {
         if (err) {
             if (err.code === "LIMIT_FILE_SIZE") {
                 return res.status(413).json({
-                    message: "A file exceeds the 25 MB limit."
+                    message: "A file exceeds the 10 MB limit."
                 });
             }
 
@@ -115,6 +127,23 @@ app.post("/upload", function(req, res) {
                 message: "Please select at least one file."
             });
         }
+
+        const usedSlots = Object.keys(fileMetadata).length + pendingUploads;
+
+        if (usedSlots + req.files.length > MAX_FILES) {
+            // Multer already saved these files, so delete them first
+            await Promise.all(
+                req.files.map(function(file) {
+                    return fs.promises.unlink(file.path);
+                })
+            );
+
+            return res.status(409).json({
+                message: "Not enough space. The file manager allows " + MAX_FILES + " files max."
+            });
+        }
+
+        pendingUploads += req.files.length;
 
         try {
             const uploadedFiles = await Promise.all(
@@ -154,6 +183,9 @@ app.post("/upload", function(req, res) {
             res.status(500).json({
                 message: "Files were saved locally, but uploading to Cloudinary failed."
             });
+        }
+        finally {
+            pendingUploads -= req.files.length;
         }
     });
 });
@@ -244,6 +276,14 @@ app.post("/folders", function(req, res) {
     if (!folderName) {
         return res.status(400).json({
             message: "Folder name is required."
+        });
+    }
+
+    const currentFolderCount = Object.keys(folders).length
+
+    if (currentFolderCount >= MAX_FOLDERS) {
+        return res.status(409).json({
+            message: "Folder limit reached (" + MAX_FOLDERS + " max)."
         });
     }
 
